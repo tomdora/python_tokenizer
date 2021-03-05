@@ -70,9 +70,60 @@ def isoctal(char):
 
 
 
+# function for comment blocks
+def comBlock(arg, loc, tokList):
+	while loc.current < len(arg):
+		if loc.current < len(arg) and arg[loc.current] == '\n':
+			
+			loc.current += 1
+			loc.start = loc.current
+			
+			break
+		
+		loc.current += 1
+	
+	return
+
+
+
+# function for string tokens
+def strTok(arg, loc, tokList):
+	while loc.current < len(arg):
+		if loc.current < len(arg) - 1 and arg[loc.current + 1] == arg[loc.start]:
+			
+			loc.current += 1
+			createTok(arg, loc, tokList, "string")
+			
+			break
+			
+		elif loc.current == len(arg) - 1:
+			# if we reach the end of the input without finding an ending quotation mark, the entire input is invalid
+			
+			print("Error - no matching quotation mark")
+			loc.start = len(arg)
+			loc.current = loc.start
+			tokList.clear()
+			
+			return
+		
+		loc.current += 1
+	
+	return
+
+
+
 # function for punctuation tokens
 def punctTok(arg, loc, tokList):
-	createTok(arg, loc, tokList, "punc")
+	if loc.current < len(arg) - 1 and arg[loc.current] == '#':
+		comBlock(arg, loc, tokList)
+		
+	elif loc.current < len(arg) - 2 and arg[loc.current] == '"' or arg[loc.current] == "'":
+		#print("String found : " + str(loc.start) + " : " + str(arg[loc.start]))
+		loc.current += 1
+		strTok(arg, loc, tokList)
+		
+	else:
+		createTok(arg, loc, tokList, "punc")
 	
 	return
 
